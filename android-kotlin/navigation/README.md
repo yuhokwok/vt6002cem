@@ -1,97 +1,67 @@
-# Data persistence
+# Android Navigation
 
-Data persistence refers to the fact that data need to persist through app life cycle changes. In other words, even if you close the app completely the data need to be restored when the user navigates back to the app.
+## Navigation
 
-> The most common mistake people make when demonstrating data persistence is that they press the Home button when they finish saving data and then tap the app icon again to bring the app back. NO! That's NOT how you demonstrate data persistence! The proper way of doing it is, after saving your data, you close the app completely using app switcher e.g. the square button and then start your app again by tapping the icon. To understand why this is the case you need to remind yourselves about Activity Lifecycle.
+Navigation refers to the interactions that allow users to navigate across, into, and back out from the different pieces of content within your app. Android Jetpack's Navigation component helps you implement navigation, from simple button clicks to more complex patterns, such as app bars and the navigation drawer. The Navigation component also ensures a consistent and predictable user experience by adhering to an established set of principles.
 
-## Lab 1 SharedPreferences and files
+Follow steps below to prepare the nav_graph xml file:
 
-### SharedPreferences
+1. Start a new Android Studio project and name it 'NavigationEx' (Template: Empty Activity). At the project view, right-click the `res` folder and select `New > Android Resource File`.
 
-SharedPreferences is a way to save simple key-value pairs. In fact, the file produced by SharedPreferences API is a plain xml file similar to the resource files you provide for the system. 
+2. In the New Resource File, type `nav_graph` for the File name, select `Navigation` for the Resource type:
+![](.md_images/create_nav_graph.png)
 
-Follow steps below to prepare the layout xml file:
+3. Rich-click the src package, create two new fragments (Black Fragment), name them `FirstFragment` and `SecondFragment` respectively :
 
-1. Start a new Android Studio project and name it 'My SharedPreferences'. In activity_main.xml, change the default layout to LinearLayout, add `android:orientation="vertical"`.
-2. In the Design view, drag and drop the following items onto the layout, below the automatically generated 'Hello World' TextView, in the order of Plain Text, TextView, and Phone. All these three go below the 'Hello World' TextView that was  by the system. Rearrange the XML so it looks like below:
+![create fragment](.md_images/create_fragment.png)
+
+4. Edit the `nav_graph` xml file, add First Fragment and Second Fragment into the Navigation Graph. 
+
+![add fragment](.md_images/add_fragments.png)
+
+5. Select the First Fragment and make it the start destination. (The house icon)
+
+![home fragment](.md_images/home_fragment.png)
+
+6. Drag an action from First Fragment to Second Fragment, select create action, and name its it as `action_firstFragment_to_secondFragment`
+
+![drag](.md_images/drag.png)
+![action](.md_images/name_action.png)
+
+3. In the `activity_main` xml file, revise the xml code in order to add NavHostFragment to the activity's layout.
 
 ```xml
-<TextView
-    android:id="@+id/name"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Name"/>
-
-<EditText
-    android:id="@+id/nameText"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:ems="10"
-    android:hint="Enter name here"
-    android:inputType="textPersonName"/>
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-<TextView
-    android:id="@+id/phone"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Phone numer"/>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
 
-<EditText
-    android:id="@+id/phoneText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:ems="10"
-    android:hint="Enter phone number here"
-    android:inputType="textCapWords|phone"
-    />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
 
-<Button
-    android:id="@+id/button"
-    android:layout_width="wrap_content"
-    android:layout_gravity="right"
-    android:layout_height="wrap_content"
-    android:text="Save"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
 ![layout](.md_images/layout.png)
 
 Next, let's need to use SharedPreferences API to save some simple data.
 
-1. Open MainActivity.java file and insert the following declarations immediately after the class declaration:
+
     
-    ```java
-    private EditText editTextName;
-    private EditText editTextPhone;
-    public static final String NAME_KEY = "NAME_KEY";
-    public static final String PHONE_KEY = "PHONE_KEY";
-    private SharedPreferences sharedPreferences;
-    ```
-    
-    Code above initializes two EditText objects that hold the user inputs and two static strings which are going to be used as keys in the key-value pairs.
-    
-2. Modify the `onCreate()` method to match the following:
-    
-    ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        
-        editTextName = (EditText) findViewById(R.id.nameText);
-        editTextPhone = (EditText) findViewById(R.id.phoneText);
-        sharedPreferences = getSharedPreferences("MySharedPreMain", Context.MODE_PRIVATE);
-        
-        if (sharedPreferences.contains(NAME_KEY)) {
-            editTextName.setText(sharedPreferences.getString(NAME_KEY, ""));
-        }
-        
-        if (sharedPreferences.contains(PHONE_KEY)) {
-            editTextPhone.setText(sharedPreferences.getString(PHONE_KEY, ""));
-        }
-    }
-    ```
-    
-    There're several methods offered by the SharedPreferences class, here `contains()` and `getString()` methods are to test if the SharedPreferenes object contains specific keys. If it does, it will get the data out.
+
     
 3. Create a call-back method that responds to the click event of the only button in the XML. Don't forget the `commit()` method, which is similar to `commit()` in FragmentTransaction. You also need to update the xml file to associate the button with this method by inserting `android:onClick="save"` line.
     
@@ -271,327 +241,3 @@ Follow steps below to create a simple app that stores some data in a file.
 Run this app in an AVD and type some info such as those in the screenshot below, and click save. Shut your app properly and re-open it, if you click the Load button your data will be retrieved. The same as in the Shared Preferences example, the file you saved can be found using the Device Monitor. You can pull the file onto your local hard drive to have a look at its contents.
 
 ![](.md_images/files.png)
-
-
-## Lab 2 SQLite Databases
-
-SharedPreferences and File storage are mainly used to store data of small quantity. If you have a large amount of data the chance is that you'll need to use SQLite database.
-
-> Exercises in this section roughly follow [the official guide](https://developer.android.com/training/data-storage/sqlite.html) and [an online tutorial written by Ravi Tamada](http://www.androidhive.info/2011/11/android-sqlite-database-tutorial/). Be aware that Google recommends using [the Room persistence library](https://developer.android.com/training/data-storage/room/index.html) instead of SQLite.
-
-### SQL in 5 minutes
-
-For those of you who aren't familiar with SQL syntax, follow instructions below to finish a very simple exercise. If you 'are familiar with SQL, you can simply skip this section and move to the next one directly.
-
-1. Click on the following link to go to [SQL Fiddle](http://sqlfiddle.com). Paste the following into the Schema Panel (left panel) and then click the Build Schema button
-    
-    ```sql
-    DROP TABLE IF EXISTS contacts;
-    CREATE TABLE contacts (
-        id INT PRIMARY KEY     NOT NULL,
-        name          TEXT    NOT NULL,
-        age           INT,
-        address       CHAR(50)
-    );
-    ```
-    
-    This will create a new table that has four columns, each of these columns has a pre-defined type. If you click the Browser button, and then click on the 'contacts (TABLE)' you'll see different columns and associated data types
-    
-    ![](.md_images/fiddle.png)
-    
-2. Click on DDL Editor button to go back to Schema Panel again. Insert the following SQL statements **below** (append, NOT replace) what's in there already and hit Build Schema button. This will insert some rows into the table. 
-    
-    ```sql
-    INSERT INTO contacts (id, name, age, address) VALUES (1, 'Paul', 22, 'Singer Hall');
-    INSERT INTO contacts (id, name, age, address) VALUES (2, 'John', 23, 'Singer Hall');
-    INSERT INTO contacts (id, name, age, address) VALUES (3, 'Ben', 23, 'Callice Court');
-    ```
-    
-3. When you see texts 'Schema Ready' below the Schema panel, you can insert the following into the SQL panel (right panel), and then click Run SQL
-    
-    ```sql
-    SELECT * FROM contacts;
-    ```
-    
-    After completion, you will see the data rows you just inserted come back from the query. You can also run queries using the 'WHERE' clause such as `SELECT * FROM contacts WHERE id = 2;`
-    
-    ![](.md_images/fiddle_o.png)
-    
-    <!-- Some of you experienced problems with SQL Fiddle lately e.g. the website is very slow. If that happens again, repeat above steps using [SQL Tryit Editor from W3Schools](http://www.w3schools.com/sql/trysql.asp?filename=trysql_delete), or try [Online SQL interpreter](https://kripken.github.io/sql.js/GUI/) as suggested by Adam Towse. -->
-
-Have a play around and make sure you understand everything, as these are important for the following exercise. In case you want to know more, go to [W3Schools](http://www.w3schools.com/sql/) and click links on the left to read.
-
-### The Contact class - the model
-
-In the following exercise, you are going to build a contact app to save some basic info of other people. First of all, let's create our data model.
-
-1. Start a new Android Studio project and name it 'My SQLite'.
-2. Right-click in the Project tool window to create a new class, and name it Contact.
-3. Modify your class to make it look like the following. You should automatically generate getters and setters instead of typing manually. You might need to 'Rearrange Code' after that.
-    
-    ```java
-    public class Contact {
-        private int id;
-        private String name;
-        private String phone;
-        
-        public Contact(int id, String name, String phone) {
-            this.id = id;
-            this.name = name;
-            this.phone = phone;
-        }
-        
-        public int getId() {
-            return id;
-        }
-        
-        public void setId(int id) {
-            this.id = id;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
-        }
-        
-        public String getPhone() {
-            return phone;
-        }
-        
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
-    }
-    ```
-
-### The layout file - the view
-
-Next, you will need to create a layout to accommodate the data model. Open activity_main.xml, replace the default layout with LinearLayout and insert `android:orientation="vertical"`. Delete the default TextView and insert the following
-
-```xml
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="ID" />
-
-<EditText
-    android:id="@+id/IDText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:hint="insert ID"
-    android:inputType="number" />
-
-<TextView
-    android:id="@+id/textView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Name" />
-
-<EditText
-    android:id="@+id/nameText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:hint="insert name"
-    android:inputType="textPersonName" />
-
-<TextView
-    android:id="@+id/textView2"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Phone" />
-
-<EditText
-    android:id="@+id/phoneText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:hint="insert phone number"
-    android:inputType="phone" />
-
-<Button
-    android:id="@+id/save"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="right"
-    android:onClick="save"
-    android:text="Save" />
-```
-
-### The DB handler and activity - the controller
-
-Once you have the model and view, you will need to work on how to link both together (i.e. controller in MVC). This is probably the most challenging part in terms of app development. However, for SQLite databases, Android provides a helper class i.e. SQLiteOpenHelper that is very handy to use.
-
-1. Create a new class called DatabseHandler extending SQLiteOpenHelper
-    
-    ![](.md_images/sqliteh.png)
-    
-    ```java
-    public class DatabaseHandler extends SQLiteOpenHelper{
-    
-    }
-    ```
-    
-2. If you move your mouse over the red highlighted class declaration you'll see that you need to implement some abstract methods in order to inherit. Insert the following codes into the class to implement the two abstract methods.
-    
-    ```java
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    }
-    ```
-    
-3. What you'll see now is that even though you have implemented the two abstract methods, there's still an error saying no constructor available. Click Code ==> Generate... ==> Constructor, in the window that pops up select the first option (the one with fewer inputs). This will generate a constructor for you.
-    
-    ```java
-    public DatabaseHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
-    }
-    ```
-    
-    There're four parameters that are passed on to super constructor. The first one is the current context and the second is the database name. The 3rd parameter is an SQLiteDatabase.CursorFactory. The last parameter is the database version, where most likely you'll want it to be 1. This auto-generated constructor is overwhelming as you don't need all those info for such a simple app. Replace it with the following simplified version:
-    
-    ```java
-    public DatabaseHandler(Context context){
-        super(context, "testDB", null, 1);
-    }
-    ```
-    
-4. By now all error messages (i.e. red underline highlights) should disappear, but still the `onCreate()` method is empty. Insert code into the method so it looks like the following:
-
-    ```java
-    public void onCreate(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE contactTable (colID, colName, colPhone)");
-    }
-    ```
-    
-    Here 'col' means column, but it can be anything as it's just a name. Note that this way of creating the table is very simple - just one line of code without declaring data type. However, there're many different ways to create tables in SQLite. Detailed instruction of this can be found on [the official SQLite documentation](https://www.sqlite.org/lang_createtable.html). 
-    
-5. In order to have a functional storage, you need to read/write to it. In terms of SQL database, this is commonly referred to as CRUD i.e. create, read, update, and delete. Insert the following method into the DatabaseHandler class
-    
-    ```java
-    public void addContact(Contact contact) {
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("colID", contact.getId());
-        contentValues.put("colName", contact.getName());
-        contentValues.put("colPhone", contact.getPhone());
-
-        long result = sqLiteDatabase.insert("contactTable", null, contentValues);
-
-        if (result > 0) {
-            Log.d("dbhelper", "inserted successfully");
-        } else {
-            Log.d("dbhelper", "failed to insert");
-        }
-        sqLiteDatabase.close();
-    }
-    ```
-    
-    The method above will insert data into the database. ContentValues is very similar to Bundle - both are used to store key-values pairs. But Bundle is associated with Intent and used to pass data in between activities. ContentValues is mainly for database insertion/updating etc. People are suggesting that ContentValues is a special case of Bundle, see [discussions on Stack Overflow](http://stackoverflow.com/questions/9334470/is-there-an-efficient-way-to-convert-from-bundle-to-contentvalues). Also note here what comes back from insertion is the row id if it's successful or '-1' if it failed.
-    
-6. Now let's work on the MainActivity to link everything together. Open MainActivity.java file and declare these variables after class declaration.
-
-    ```java
-    private EditText idText;
-    private EditText nameText;
-    private EditText phoneText;
-    ```
-    
-    Insert variable initializations in `onCreate()` method
-
-    ```java
-    idText = (EditText) findViewById(R.id.IDText);
-    nameText = (EditText) findViewById(R.id.nameText);
-    phoneText = (EditText) findViewById(R.id.phoneText);
-    ```
-
-    Next, create a `save()` method. You should also associate this method with the 'save' button in activity_main.xml.
-
-    ```java
-    public void save(View v){
-        int anID = Integer.parseInt(idText.getText().toString());
-        String aName = nameText.getText().toString();
-        String aPhone = phoneText.getText().toString();
-        DatabaseHandler db = new DatabaseHandler(this);
-        db.addContact(new Contact(anID, aName, aPhone));
-    }
-    ```
-
-If you run this app in an AVD and insert some texts and click save, what you'll see is that there's a log entry produced:
-
-![](.md_images/sqlite_screen.png)
-
-`'. .'`'. .'`'. .'`'. .'`'. .'`'. .'`'. .'`'. .'`'. .'`'. .'(a beautiful divider)
-   `     `     `     `     `     `     `     `     `     `
-
-![](.md_images/db_insert.png)
-
-### Verify the results
-
-Open the Android Device Monitor, locate the SQLite database you just created. Export this file to your hard drive.
-
-![](.md_images/db_file.png)
-
-Next, download and install a tool called [SQLiteStudio](https://sqlitestudio.pl). Once installed, load your database in it. What you'll see is that the data you typed are actually being saved.
-
-Now you have finished database insertion. The rest of the CRUD operation follow exactly the same routes. With the help of [the official documentation of SQLiteDatabase class](https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html), try to implement 'read', 'update' and 'delete'.
-
-<!-- ## Lab 3 Advanced topics
-
-### Free online tutorial
-
-You should be really careful with free online tutorials, as some may contain out-of-date or even incorrect information. One example is the SharedPreferences example on [TutorialsPoint](http://www.tutorialspoint.com/android/android_shared_preferences.htm) that still shows MODE_WORLD_READABLE and MODE_WORLD_WRITEABLE, both of which were [deprecated in API level 17](http://developer.android.com/reference/android/content/Context.html#MODE_WORLD_READABLE). In general, TutorialsPoint is a good website. But for this particular case at least it's not very helpful.
-
-### Array data using SharedPreferences
-
-Typically SharedPreferences APIs are designed to handle simple key-value pairs. But it can be configured to handle arrays as well. Consider the following code example, taken from [Stack Overflow](http://stackoverflow.com/questions/3876680/is-it-possible-to-add-an-array-or-object-to-sharedpreferences-on-android).  
-
-```java
-// to save string array
-public boolean saveArray(String[] array, String arrayName, Context mContext) {   
-    SharedPreferences prefs = mContext.getSharedPreferences("preferencename", 0);  
-    SharedPreferences.Editor editor = prefs.edit();  
-    editor.putInt(arrayName +"_size", array.length);  
-    for(int i=0;i<array.length;i++)  
-        editor.putString(arrayName + "_" + i, array[i]);  
-    return editor.commit();  
-} 
-    
-// to retrieve string array
-public String[] loadArray(String arrayName, Context mContext) {  
-    SharedPreferences prefs = mContext.getSharedPreferences("preferencename", 0);  
-    int size = prefs.getInt(arrayName + "_size", 0);  
-    String array[] = new String[size];  
-    for(int i=0;i<size;i++)  
-        array[i] = prefs.getString(arrayName + "_" + i, null);  
-    return array;  
-}  
-```
-
-* What will happen if the array size changes e.g. reduce?
-
-### External storage
-
-What you have done in lab 1 is to use internal storage. What can also be done is to use external storage i.e. SD card. The procedures are pretty much the same. The only two differences are:
-
-1.    You'll need to add permissions in the manifest.
-2.    You'll need to check the status `Environment.getExternalStorageState()`.
-
-* Can you change the example in lab 1 so that the system write to external storage?
-
-### SQLite CRUD operations
-
-Read through [the online tutorial written by Ravi Tamada](http://www.androidhive.info/2011/11/android-sqlite-database-tutorial/) and answer the following questions:
-
-* How to define a 'contract' class, as suggested [in the official Android guide](http://developer.android.com/training/basics/data-storage/databases.html), to improve the tutorial?
-* How would you implement 'delete'/'update' on the UI?
-
-### A demo project on using a pre-existing SQLite database is available in the repository -->
-
-
