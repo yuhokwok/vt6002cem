@@ -111,7 +111,7 @@ Build and run the application. You can see the launching activity prompts with t
 ![add_argument 1](.md_images/add_argument0.png)
 ![add_argument 2](.md_images/add_argument.png)
 
-13. To implement pass data from one destination to another destination, we can either use `SafeArgs` plugin or `Bundle`. At the `onCreateView` function. Add the following code to create a bundle and put it into the `navigate` function.
+13. To implement pass data from one destination to another destination, we can either use `SafeArgs` plugin or `Bundle`. At the `onCreateView` function. At `FirstFragment.kt`, add the following code to create a bundle and put it into the `navigate` function.
     
     ```kotlin
     override fun onCreateView(
@@ -131,7 +131,7 @@ Build and run the application. You can see the launching activity prompts with t
     }
     ```
 
-14. In Second Arguement's `onResume` Function, get the data using the built-in `argument` attribute and show it using a `Toast`
+14. In Second Fragment's `onResume` Function, get the data using the built-in `argument` attribute and show it using a `Toast`
 
     ```kotlin
     override fun onResume() {
