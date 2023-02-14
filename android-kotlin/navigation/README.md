@@ -92,7 +92,7 @@ Build and run the application. You can see the launching activity prompts with t
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view : View = inflater.inflate(R.layout.fragment_blank, container, false)
+        val view : View = inflater.inflate(R.layout.fragment_first, container, false)
         val button  = view.findViewById<Button>(R.id.button)
         button.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
@@ -119,7 +119,7 @@ Build and run the application. You can see the launching activity prompts with t
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view : View = inflater.inflate(R.layout.fragment_blank, container, false)
+        val view : View = inflater.inflate(R.layout.fragment_first, container, false)
         val button  = view.findViewById<Button>(R.id.button)
         button.setOnClickListener(object : View.OnClickListener {
             override fun onClick(view: View) {
