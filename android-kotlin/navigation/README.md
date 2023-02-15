@@ -131,7 +131,7 @@ Build and run the application. You can see the launching activity prompts with t
     }
     ```
 
-14. In Second Fragment's `onResume` Function, get the data using the built-in `argument` attribute and show it using a `Toast`
+14. In Second Fragment's (`SecondFragment.kt`) `onResume` Function, get the data using the built-in `argument` attribute and show it using a `Toast`
 
     ```kotlin
     override fun onResume() {
