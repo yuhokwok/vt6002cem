@@ -329,42 +329,8 @@ In the following exercise, you are going to build a contact app to save some bas
 2. Right-click in the Project tool window to create a new class, and name it Contact.
 3. Modify your class to make it look like the following. You should automatically generate getters and setters instead of typing manually. You might need to 'Rearrange Code' after that.
     
-    ```java
-    public class Contact {
-        private int id;
-        private String name;
-        private String phone;
-        
-        public Contact(int id, String name, String phone) {
-            this.id = id;
-            this.name = name;
-            this.phone = phone;
-        }
-        
-        public int getId() {
-            return id;
-        }
-        
-        public void setId(int id) {
-            this.id = id;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
-        }
-        
-        public String getPhone() {
-            return phone;
-        }
-        
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
-    }
+    ```kotlin
+    class Contact(var id: Int, var name: String, var phone: String)
     ```
 
 ### The layout file - the view
@@ -427,45 +393,36 @@ Once you have the model and view, you will need to work on how to link both toge
     
     ![](.md_images/sqliteh.png)
     
-    ```java
-    public class DatabaseHandler extends SQLiteOpenHelper{
+    ```kotlin
+    class DatabaseHandler(context: Context?, name: String?, factory: CursorFactory?, version: Int) :
+    SQLiteOpenHelper(ontext: Context?, name: String?, factory: CursorFactory?, version: Int) {
     
     }
     ```
     
 2. If you move your mouse over the red highlighted class declaration you'll see that you need to implement some abstract methods in order to inherit. Insert the following codes into the class to implement the two abstract methods.
     
-    ```java
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-    }
+    ```kotlin
+    override fun onCreate(sqLiteDatabase: SQLiteDatabase) { }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    }
+    override fun onUpgrade(sqLiteDatabase: SQLiteDatabase, i: Int, i1: Int) {}
     ```
     
-3. What you'll see now is that even though you have implemented the two abstract methods, there's still an error saying no constructor available. Click Code ==> Generate... ==> Constructor, in the window that pops up select the first option (the one with fewer inputs). This will generate a constructor for you.
     
-    ```java
-    public DatabaseHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+3. There're four parameters that are passed on to super constructor. The first one is the current context and the second is the database name. The 3rd parameter is an SQLiteDatabase.CursorFactory. The last parameter is the database version, where most likely you'll want it to be 1. This auto-generated constructor is overwhelming as you don't need all those info for such a simple app. Replace it with the following simplified version:
+
+    ```kotlin
+    class DatabaseHandler(context: Context?, name: String?, factory: CursorFactory?, version: Int) :
+    SQLiteOpenHelper(context, "testDB", null, 1) {
+    
     }
     ```
-    
-    There're four parameters that are passed on to super constructor. The first one is the current context and the second is the database name. The 3rd parameter is an SQLiteDatabase.CursorFactory. The last parameter is the database version, where most likely you'll want it to be 1. This auto-generated constructor is overwhelming as you don't need all those info for such a simple app. Replace it with the following simplified version:
-    
-    ```java
-    public DatabaseHandler(Context context){
-        super(context, "testDB", null, 1);
-    }
-    ```
-    
+
 4. By now all error messages (i.e. red underline highlights) should disappear, but still the `onCreate()` method is empty. Insert code into the method so it looks like the following:
 
-    ```java
-    public void onCreate(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE contactTable (colID, colName, colPhone)");
+    ```kotlin
+    override fun onCreate(sqLiteDatabase: SQLiteDatabase) {
+        sqLiteDatabase.execSQL("CREATE TABLE contactTable (colID, colName, colPhone)")
     }
     ```
     
@@ -473,23 +430,20 @@ Once you have the model and view, you will need to work on how to link both toge
     
 5. In order to have a functional storage, you need to read/write to it. In terms of SQL database, this is commonly referred to as CRUD i.e. create, read, update, and delete. Insert the following method into the DatabaseHandler class
     
-    ```java
-    public void addContact(Contact contact) {
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("colID", contact.getId());
-        contentValues.put("colName", contact.getName());
-        contentValues.put("colPhone", contact.getPhone());
-
-        long result = sqLiteDatabase.insert("contactTable", null, contentValues);
-
+    ```kotlin
+    fun addContact(contact: Contact) {
+        val sqLiteDatabase = readableDatabase
+        val contentValues = ContentValues()
+        contentValues.put("colID", contact.id)
+        contentValues.put("colName", contact.name)
+        contentValues.put("colPhone", contact.phone)
+        val result = sqLiteDatabase.insert("contactTable", null, contentValues)
         if (result > 0) {
-            Log.d("dbhelper", "inserted successfully");
+            Log.d("dbhelper", "inserted successfully")
         } else {
-            Log.d("dbhelper", "failed to insert");
+            Log.d("dbhelper", "failed to insert")
         }
-        sqLiteDatabase.close();
+        sqLiteDatabase.close()
     }
     ```
     
@@ -497,29 +451,29 @@ Once you have the model and view, you will need to work on how to link both toge
     
 6. Now let's work on the MainActivity to link everything together. Open MainActivity.java file and declare these variables after class declaration.
 
-    ```java
-    private EditText idText;
-    private EditText nameText;
-    private EditText phoneText;
+    ```kotlin
+    private var idText: EditText? = null
+    private var nameText: EditText? = null
+    private var phoneText: EditText? = null
     ```
     
     Insert variable initializations in `onCreate()` method
 
-    ```java
-    idText = (EditText) findViewById(R.id.IDText);
-    nameText = (EditText) findViewById(R.id.nameText);
-    phoneText = (EditText) findViewById(R.id.phoneText);
+    ```kotlin
+    idText = findViewById<EditText>(R.id.IDText) 
+    nameText = findViewById<EditText>(R.id.nameText) 
+    phoneText = findViewById<EditText>(R.id.phoneText) 
     ```
 
     Next, create a `save()` method. You should also associate this method with the 'save' button in activity_main.xml.
 
-    ```java
-    public void save(View v){
-        int anID = Integer.parseInt(idText.getText().toString());
-        String aName = nameText.getText().toString();
-        String aPhone = phoneText.getText().toString();
-        DatabaseHandler db = new DatabaseHandler(this);
-        db.addContact(new Contact(anID, aName, aPhone));
+    ```kotlin
+    fun save(v: View? = null) {
+        val anID = idText!!.text.toString().toInt()
+        val aName = nameText!!.text.toString()
+        val aPhone = phoneText!!.text.toString()
+        val db = DatabaseHandler(this)
+        db.addContact(Contact(anID, aName, aPhone))
     }
     ```
 
@@ -532,13 +486,34 @@ If you run this app in an AVD and insert some texts and click save, what you'll 
 
 ![](.md_images/db_insert.png)
 
-### Verify the results
+7. Define a getContacts fun at the DatabaseHandler: 
 
-Open the Android Device Monitor, locate the SQLite database you just created. Export this file to your hard drive.
+    ```kotlin
+    fun getContacts() : Array<Contact> {
+        var contacts = mutableListOf<Contact>()
+        val sqLiteDatabase = readableDatabase
+        val columns: Array<String> =
+            arrayOf<String>("colID", "colName", "colPhone")
+        val cursor: Cursor =
+            sqLiteDatabase.query("contactTable", columns, null, null, null, null, null)
+        if (cursor != null) {
+            cursor.moveToFirst()
+        }
 
-![](.md_images/db_file.png)
+        cursor.moveToFirst()
+        do {
+            val id = cursor.getInt(0)
+            val name = cursor.getString(1)
+            val phone = cursor.getString(2)
+            val contact = Contact(id, name, phone)
+            contacts.add(contact)
 
-Next, download and install a tool called [SQLiteStudio](https://sqlitestudio.pl). Once installed, load your database in it. What you'll see is that the data you typed are actually being saved.
+        } while(cursor.moveToNext())
+        return contacts.toTypedArray()
+    }
+    ```
+8. Base on what you learn, try to create a list to display the content of the tablebase.
+
 
 Now you have finished database insertion. The rest of the CRUD operation follow exactly the same routes. With the help of [the official documentation of SQLiteDatabase class](https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html), try to implement 'read', 'update' and 'delete'.
 
